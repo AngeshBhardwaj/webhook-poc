@@ -1,0 +1,24 @@
+{
+  "name": "webhooks-poc",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.8",
+    "amqp": "^0.2.7",
+    "amqplib": "^0.10.5",
+    "cloudevents": "^8.0.2",
+    "hono": "^4.7.0",
+    "node-fetch": "^3.3.2",
+    "uuid": "^11.0.5"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.6",
+    "@types/node": "^20.11.17",
+    "@types/node-fetch": "^2.6.12",
+    "@types/uuid": "^10.0.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.7.3"
+  }
+}
