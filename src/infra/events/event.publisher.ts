@@ -1,25 +1,14 @@
 import { CloudEvent, HTTP } from 'cloudevents';
-import { v4 as uuidv4 } from 'uuid';
 import { sendToQueue } from './event.queue';
-import { MaterialCreatedPayload } from "../../domain/materials/materials.model";
 
 
-export function publishEvent(type: string, data: MaterialCreatedPayload) {
-  const event: CloudEvent<MaterialCreatedPayload> = new CloudEvent({
-    id: uuidv4(),
-    type,
-    source: '/materials',
-    data,
-    correlationid: uuidv4(),
-    causationid: uuidv4(),
-  });
-
+export function publishEvent(event: CloudEvent<unknown>) {
   sendToQueue(event);
 }
 
 
 export type CreateEvent = <T>(type: string) => (data: T) => (domainTrace: DomainTrace) => CloudEvent<T>;
-const createEvent: CreateEvent = <T>(type: string) => (data: T) => (domainTrace: DomainTrace) => {
+export const createEvent: CreateEvent = <T>(type: string) => (data: T) => (domainTrace: DomainTrace) => {
   const event: CloudEvent<T> = new CloudEvent({
     type,
     messagetype: 'event',
@@ -35,7 +24,7 @@ export const createCommand: CreateEvent = <T>(type: string) => (data: T) => (dom
     type,
     messagetype: 'command',
     source: '/materials',
-    data,
+    ...data,
     ...domainTrace
   });
   return event;

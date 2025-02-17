@@ -1,35 +1,38 @@
-import { MaterialCreatedEvent, CreateMaterialCmd, Return, CreateMaterialFailures, fail, MaterialCreatedPayload } from '../../domain/materials/materials.model'
+import { MaterialCreatedEvent, CreateMaterialCmd, CreateMaterialFailures, fail, MaterialCreatedPayload, succeed, Success, Failure } from '../../domain/materials/materials.model'
 import { v4 as uuidv4 } from 'uuid';
+import { DomainTrace, domainTraceFromMsg, createEvent } from '../../infra/events/event.publisher';
 
-let materials: Material[] = [];
+let materials: MaterialCreatedPayload[] = [];
 
 export class MaterialsService {
-  getAll(): Material[] {
+  getAll(): MaterialCreatedPayload[] {
     return materials;
   }
 
-  getById(id: string): Material | undefined {
+  getById(id: string): MaterialCreatedPayload | undefined {
     return materials.find(material => material.id === id);
   }
 
-  create(material: CreateMaterialCmd): Return<MaterialCreatedEvent, CreateMaterialFailures> {
+  create(material: CreateMaterialCmd): Success<MaterialCreatedEvent> | Failure<CreateMaterialFailures> {
     const exists = !!materials.find(m => m.name);
     if(exists){
-      return fail('already_exists')
+      return fail('already_exists') as Failure<CreateMaterialFailures>;
     }
 
-    materials.push(material);
-    const id = uuidv4(); 
-    const materialCreatedPayload: MaterialCreatedPayload = {
-      ...material.data, id
+    let materialToAdd: MaterialCreatedPayload = {
+      id: '',
+      ...material.data!
     }
+    materialToAdd.id = uuidv4();
+    materials.push(materialToAdd);
+    const materialCreatedPayload: MaterialCreatedPayload = materialToAdd;
 
-    const domainTrace: DomainTrace = domainTraceFromMsg(createMaterialCmd)
-    const materialCreatedEvent: MaterialCreatedEvent = createEvent('material-created')(materialCreatedPayload)(domainTrace)
-    return succeed(materialCreatedEvent);
+    const domainTrace: DomainTrace = domainTraceFromMsg(material)
+    const materialCreatedEvent: MaterialCreatedEvent = createEvent('material-created')(materialCreatedPayload)(domainTrace) as MaterialCreatedEvent;
+    return succeed(materialCreatedEvent) as Success<MaterialCreatedEvent>;
   }
 
-  update(id: string, updatedMaterial: Partial<Material>): Material | undefined {
+  update(id: string, updatedMaterial: Partial<MaterialCreatedPayload>): MaterialCreatedPayload | undefined {
     const index = materials.findIndex(material => material.id === id);
     if (index !== -1) {
       materials[index] = { ...materials[index], ...updatedMaterial };

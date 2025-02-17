@@ -11,6 +11,7 @@ export type MaterialCreatedEvent = CloudEvent<MaterialCreatedPayload>;
 
 
 export type CreateMaterialCmd = Command<CreateMaterialPayload>;
+// export type CreateMaterialCmd = Command<CreateEvent>;
 export type CreateMaterialPayload = {
   name: string;
   description: string;
@@ -18,10 +19,8 @@ export type CreateMaterialPayload = {
 }
 
 export type CreateMaterialFailures = 'already_exists'
-export type Command<T> = {
-  data: T
-}
 
+export type Command<T> = CloudEvent<T>;
 
 export type Return<T, F> = Success<T> | Failure<F>
 export type Success<T> = {_d: "success", data: T}

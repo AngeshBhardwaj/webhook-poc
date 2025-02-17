@@ -2,8 +2,8 @@ import fetch from 'node-fetch';
 import { CloudEvent, httpTransport, emitterFor } from "cloudevents";
 
 const clients = [
-  { url: 'https://angeshisthe.co.in/materials', 
-  events: ['MaterialCreated', 'MaterialUpdated', 'MaterialDeleted'], 
+  { url: 'https://webhook.site/c9f939bf-9ead-40b9-9a0d-118a75a8f587', 
+  events: ['material-created', 'MaterialUpdated', 'MaterialDeleted'], 
   clientSecret: "xyz", },
   
   // Add more clients as needed
@@ -16,6 +16,7 @@ export async function sendWebhook(event: CloudEvent<unknown>) {
   // with aretry and create a failed event and publish it.
 
   for (const client of clients) {
+    // console.log(`Sending webhook to ${client} for event: ${event}`);
     if (client.events.includes(event.type)) {
       // await fetch(client.url, {
       //   method: 'POST',
@@ -30,7 +31,7 @@ export async function sendWebhook(event: CloudEvent<unknown>) {
         // If retry counter exceeds, create failed event.
       // If ERROR, log error and create failed event
 
-      console.log(res);
+      // console.log(res);
     }
   }
 }
