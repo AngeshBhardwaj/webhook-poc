@@ -8,9 +8,11 @@ export type MaterialCreatedPayload = {
   }
   
 export type MaterialCreatedEvent = CloudEvent<MaterialCreatedPayload>;
+export type MaterialUpdatedEvent = CloudEvent<MaterialCreatedPayload>;
 
 
 export type CreateMaterialCmd = Command<CreateMaterialPayload>;
+export type UpdateMaterialCmd = Command<Partial<MaterialCreatedPayload>>;
 // export type CreateMaterialCmd = Command<CreateEvent>;
 export type CreateMaterialPayload = {
   name: string;
@@ -19,6 +21,7 @@ export type CreateMaterialPayload = {
 }
 
 export type CreateMaterialFailures = 'already_exists'
+export type UpdateMaterialFailures = 'does_not_exists' | 'invalid_quantity' | 'read_only_field'
 
 export type Command<T> = CloudEvent<T>;
 

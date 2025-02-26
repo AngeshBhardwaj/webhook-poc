@@ -1,4 +1,14 @@
-import { MaterialCreatedEvent, CreateMaterialCmd, CreateMaterialFailures, fail, MaterialCreatedPayload, succeed, Success, Failure } from '../../domain/materials/materials.model'
+import { MaterialCreatedEvent, 
+  CreateMaterialCmd, 
+  CreateMaterialFailures, 
+  fail, 
+  MaterialCreatedPayload, 
+  succeed, 
+  Success, 
+  Failure, 
+  UpdateMaterialCmd, 
+  MaterialUpdatedEvent, 
+  UpdateMaterialFailures } from '../../domain/materials/materials.model'
 import { v4 as uuidv4 } from 'uuid';
 import { DomainTrace, domainTraceFromMsg, createEvent } from '../../infra/events/event.publisher';
 
@@ -27,19 +37,31 @@ export class MaterialsService {
     materials.push(materialToAdd);
     const materialCreatedPayload: MaterialCreatedPayload = materialToAdd;
 
-    const domainTrace: DomainTrace = domainTraceFromMsg(material)
+    const domainTrace: DomainTrace = domainTraceFromMsg(material);
     const materialCreatedEvent: MaterialCreatedEvent = createEvent('material-created')(materialCreatedPayload)(domainTrace) as MaterialCreatedEvent;
     return succeed(materialCreatedEvent) as Success<MaterialCreatedEvent>;
   }
 
-  update(id: string, updatedMaterial: Partial<MaterialCreatedPayload>): MaterialCreatedPayload | undefined {
+  update(id: string, updatedMaterial: UpdateMaterialCmd): Success<MaterialUpdatedEvent> | Failure<UpdateMaterialFailures> {
     const index = materials.findIndex(material => material.id === id);
-    if (index !== -1) {
-      materials[index] = { ...materials[index], ...updatedMaterial };
-      return materials[index];
+    if (index === -1) {
+      return fail('does_not_exists') as Failure<UpdateMaterialFailures>;
     }
-    return undefined;
+    materials[index] = {...materials[index], ...updatedMaterial.data};
+
+    const domainTrace: DomainTrace = domainTraceFromMsg(updatedMaterial);
+    const materialUpdatedEvent: MaterialUpdatedEvent = createEvent('material-updated')(materials[index])(domainTrace) as MaterialUpdatedEvent;
+    return succeed(materialUpdatedEvent) as Success<MaterialUpdatedEvent>;
   }
+  
+  // update(id: string, updatedMaterial: Partial<MaterialCreatedPayload>): MaterialCreatedPayload | undefined {
+  //   const index = materials.findIndex(material => material.id === id);
+  //   if (index !== -1) {
+  //     materials[index] = { ...materials[index], ...updatedMaterial };
+  //     return materials[index];
+  //   }
+  //   return undefined;
+  // }
 
   delete(id: string): boolean {
     const index = materials.findIndex(material => material.id === id);

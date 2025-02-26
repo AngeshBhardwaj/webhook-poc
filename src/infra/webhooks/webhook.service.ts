@@ -5,7 +5,7 @@ import { CloudEvent, httpTransport, emitterFor } from "cloudevents";
 
 const clients = [
   { url: 'https://webhook.site/dff49f50-662b-4562-81ea-661ef555e75b', 
-    events: ['material-created', 'material-updated', 'material-deleted'], 
+    events: ['material-created', 'material-deleted'], 
     clientSecret: "xyz", 
   },
   { url: 'https://webhook.site/76d63fe4-af3e-4b0c-9ad8-ca411057d5cb', 
